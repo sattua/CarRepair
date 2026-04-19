@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "scripts": {
-  "build": "esbuild src/main.jsx --bundle --format=iife --outfile=public/dist/main.js --loader:.css=text",
+  "build": "esbuild src/main.jsx --bundle --outfile=public/dist/main.js",
   "start": "http-server public -p 5173"
 },
   "dependencies": {

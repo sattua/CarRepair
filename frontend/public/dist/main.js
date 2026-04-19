@@ -1084,7 +1084,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState3(initialState) {
+          function useState5(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1096,7 +1096,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect3(create, deps) {
+          function useEffect4(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1879,7 +1879,7 @@
           exports.useContext = useContext3;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect3;
+          exports.useEffect = useEffect4;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -1887,7 +1887,7 @@
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer;
           exports.useRef = useRef3;
-          exports.useState = useState3;
+          exports.useState = useState5;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -23582,11 +23582,11 @@
   });
 
   // src/main.jsx
-  var import_react4 = __toESM(require_react());
+  var import_react6 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // src/app.jsx
-  var import_react3 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
 
   // node_modules/react-router-dom/dist/index.js
   var React2 = __toESM(require_react());
@@ -25571,26 +25571,138 @@
   }
 
   // src/containers/home.jsx
+  var import_react2 = __toESM(require_react());
+
+  // src/hooks/useRepairs.js
   var import_react = __toESM(require_react());
+
+  // src/services/repairsApi.js
+  var API_URL = "http://localhost:8000";
+  async function getRepairs() {
+    const res = await fetch(`${API_URL}/repairs`);
+    return res.json();
+  }
+  async function createRepair(data) {
+    const res = await fetch(`${API_URL}/repairs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  }
+
+  // src/hooks/useRepairs.js
+  function useRepairs() {
+    const [repairs, setRepairs] = (0, import_react.useState)([]);
+    const [loading, setLoading] = (0, import_react.useState)(true);
+    (0, import_react.useEffect)(() => {
+      getRepairs().then((data) => setRepairs(data)).finally(() => setLoading(false));
+    }, []);
+    return { repairs, loading };
+  }
+
+  // src/containers/home.jsx
   function Home() {
-    return /* @__PURE__ */ import_react.default.createElement("div", { className: "home-page" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "home-container" }, /* @__PURE__ */ import_react.default.createElement("header", { className: "home-header" }, /* @__PURE__ */ import_react.default.createElement("h1", null, "Vehicle Repair System"), /* @__PURE__ */ import_react.default.createElement("p", null, "Manage repair estimates in a simple way")), /* @__PURE__ */ import_react.default.createElement("div", { className: "home-card" }, /* @__PURE__ */ import_react.default.createElement("h2", null, "Repairs Dashboard"), /* @__PURE__ */ import_react.default.createElement("p", null, "Create and track vehicle repair estimates."), /* @__PURE__ */ import_react.default.createElement("div", { className: "home-actions" }, /* @__PURE__ */ import_react.default.createElement(Link, { to: "/create", className: "primary-button" }, "Create Repair")))));
+    const { repairs, loading } = useRepairs();
+    return /* @__PURE__ */ import_react2.default.createElement("div", { className: "container py-5" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center mb-4" }, /* @__PURE__ */ import_react2.default.createElement("h1", { className: "fw-bold" }, "Vehicle Repair System"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "text-muted" }, "Track and manage repairs easily")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "d-flex justify-content-end mb-4" }, /* @__PURE__ */ import_react2.default.createElement(Link, { to: "/create", className: "btn btn-primary" }, "+ Create Repair")), loading && /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center text-muted" }, "Loading repairs..."), /* @__PURE__ */ import_react2.default.createElement("div", { className: "row g-3" }, repairs.map((r) => /* @__PURE__ */ import_react2.default.createElement("div", { className: "col-md-4", key: r.id }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "card shadow-sm border-0 h-100" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "card-body" }, /* @__PURE__ */ import_react2.default.createElement("h5", { className: "card-title" }, r.vehicle), /* @__PURE__ */ import_react2.default.createElement("p", { className: "card-text text-muted" }, r.issue), /* @__PURE__ */ import_react2.default.createElement("div", { className: "d-flex justify-content-between align-items-center" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "badge bg-success" }, "$", r.cost), /* @__PURE__ */ import_react2.default.createElement("small", { className: "text-muted" }, "ID: ", r.id))))))));
   }
 
   // src/containers/repairForm.jsx
-  var import_react2 = __toESM(require_react());
+  var import_react4 = __toESM(require_react());
+
+  // src/hooks/useRepairForm.js
+  var import_react3 = __toESM(require_react());
+  function useRepairForm(initial = {
+    id: "",
+    vehicle: "",
+    issue: "",
+    cost: ""
+  }) {
+    const [form, setForm] = (0, import_react3.useState)(initial);
+    const handleChange = (e) => {
+      setForm({
+        ...form,
+        [e.target.name]: e.target.value
+      });
+    };
+    const reset = () => setForm(initial);
+    return {
+      form,
+      setForm,
+      handleChange,
+      reset
+    };
+  }
+
+  // src/hooks/useCreateRepair.js
+  function useCreateRepair() {
+    const submit = async (form) => {
+      return await createRepair({
+        ...form,
+        id: Number(form.id),
+        cost: Number(form.cost)
+      });
+    };
+    return { submit };
+  }
+
+  // src/containers/repairForm.jsx
   function RepairForm() {
-    return /* @__PURE__ */ import_react2.default.createElement("div", { className: "container" }, /* @__PURE__ */ import_react2.default.createElement("h1", null, "Create Repair"), /* @__PURE__ */ import_react2.default.createElement("form", null, /* @__PURE__ */ import_react2.default.createElement("input", { placeholder: "Car model" }), /* @__PURE__ */ import_react2.default.createElement("input", { placeholder: "Issue description" }), /* @__PURE__ */ import_react2.default.createElement("button", { type: "submit" }, "Save")), /* @__PURE__ */ import_react2.default.createElement(Link, { to: "/" }, "Back"));
+    const { form, handleChange, reset } = useRepairForm();
+    const { submit } = useCreateRepair();
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      await submit(form);
+      reset();
+      alert("Repair created");
+    };
+    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "container py-5", style: { maxWidth: "600px" } }, /* @__PURE__ */ import_react4.default.createElement("h2", { className: "mb-4" }, "Create Repair"), /* @__PURE__ */ import_react4.default.createElement("form", { onSubmit: handleSubmit, className: "card p-4 shadow-sm" }, /* @__PURE__ */ import_react4.default.createElement(
+      "input",
+      {
+        className: "form-control mb-2",
+        name: "id",
+        placeholder: "ID",
+        value: form.id,
+        onChange: handleChange
+      }
+    ), /* @__PURE__ */ import_react4.default.createElement(
+      "input",
+      {
+        className: "form-control mb-2",
+        name: "vehicle",
+        placeholder: "Vehicle",
+        value: form.vehicle,
+        onChange: handleChange
+      }
+    ), /* @__PURE__ */ import_react4.default.createElement(
+      "input",
+      {
+        className: "form-control mb-2",
+        name: "issue",
+        placeholder: "Issue",
+        value: form.issue,
+        onChange: handleChange
+      }
+    ), /* @__PURE__ */ import_react4.default.createElement(
+      "input",
+      {
+        className: "form-control mb-3",
+        name: "cost",
+        placeholder: "Cost",
+        value: form.cost,
+        onChange: handleChange
+      }
+    ), /* @__PURE__ */ import_react4.default.createElement("button", { className: "btn btn-primary w-100" }, "Create Repair")), /* @__PURE__ */ import_react4.default.createElement("div", { className: "card" }, /* @__PURE__ */ import_react4.default.createElement("button", { className: "btn w-100" }, " ", /* @__PURE__ */ import_react4.default.createElement(Link, { to: "/" }, "Go Back"), " ")));
   }
 
   // src/app.jsx
   function App() {
-    return /* @__PURE__ */ import_react3.default.createElement(BrowserRouter, null, /* @__PURE__ */ import_react3.default.createElement(Routes, null, /* @__PURE__ */ import_react3.default.createElement(Route, { path: "/", element: /* @__PURE__ */ import_react3.default.createElement(Home, null) }), /* @__PURE__ */ import_react3.default.createElement(Route, { path: "/create", element: /* @__PURE__ */ import_react3.default.createElement(RepairForm, null) })));
+    return /* @__PURE__ */ import_react5.default.createElement(BrowserRouter, null, /* @__PURE__ */ import_react5.default.createElement(Routes, null, /* @__PURE__ */ import_react5.default.createElement(Route, { path: "/", element: /* @__PURE__ */ import_react5.default.createElement(Home, null) }), /* @__PURE__ */ import_react5.default.createElement(Route, { path: "/create", element: /* @__PURE__ */ import_react5.default.createElement(RepairForm, null) })));
   }
 
   // src/main.jsx
-  console.log("MAIN LOADING");
   var root = (0, import_client.createRoot)(document.getElementById("root"));
-  root.render(/* @__PURE__ */ import_react4.default.createElement(App, null));
+  root.render(/* @__PURE__ */ import_react6.default.createElement(App, null));
 })();
 /*! Bundled license information:
 
