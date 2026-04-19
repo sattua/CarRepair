@@ -1,36 +1,35 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useRepairs } from "../hooks/useRepairs";
+import { Link, useNavigate } from "react-router-dom";
+import { useRepairs } from "../hooks/useRepairs.js";
 
 export default function Home() {
   const { repairs, loading } = useRepairs();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload()
+  };
 
   return (
     <div className="container py-5">
-
-      {/* Header */}
       <div className="text-center mb-4">
         <h1 className="fw-bold">Vehicle Repair System</h1>
         <p className="text-muted">Track and manage repairs easily</p>
       </div>
-
-      {/* Action */}
       <div className="d-flex justify-content-end mb-4">
         <Link to="/create" className="btn btn-primary">
           + Create Repair
         </Link>
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className="text-center text-muted">
           Loading repairs...
         </div>
       )}
 
-      {/* Grid */}
       <div className="row g-3">
-
         {repairs.map((r) => (
           <div className="col-md-4" key={r.id}>
             <div className="card shadow-sm border-0 h-100">
@@ -57,8 +56,16 @@ export default function Home() {
             </div>
           </div>
         ))}
-
       </div>
+      <div className="container" >
+        <button
+            className="btn btn-danger"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+      </div>
+
     </div>
   );
 }

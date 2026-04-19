@@ -1,8 +1,10 @@
 import { createRepair } from "../services/repairsApi";
 
 export function useCreateRepair() {
+  
   const submit = async (form) => {
-    return await createRepair({
+    const token = localStorage.getItem("token");
+    return await createRepair(token,{
       ...form,
       id: Number(form.id),
       cost: Number(form.cost)

@@ -1,15 +1,29 @@
 const API_URL = "http://localhost:8000";
 
-export async function getRepairs() {
-  const res = await fetch(`${API_URL}/repairs`);
-  return res.json();
+export async function getRepairs(token) {
+  const res = await fetch("http://localhost:8000/repairs", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error("Error fetching repairs");
+  }
+
+  return data;
 }
 
-export async function createRepair(data) {
+export async function createRepair(token, repair) {
   const res = await fetch(`${API_URL}/repairs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(repair)
   });
 
   return res.json();

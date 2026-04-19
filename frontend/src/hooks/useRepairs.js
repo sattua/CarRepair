@@ -6,9 +6,19 @@ export function useRepairs() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRepairs()
-      .then((data) => setRepairs(data))
-      .finally(() => setLoading(false));
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const data = await getRepairs(token);
+
+        setRepairs(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return { repairs, loading };

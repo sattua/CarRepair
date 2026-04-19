@@ -1084,7 +1084,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState5(initialState) {
+          function useState7(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1887,7 +1887,7 @@
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer;
           exports.useRef = useRef3;
-          exports.useState = useState5;
+          exports.useState = useState7;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2383,9 +2383,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React7 = require_react();
+          var React8 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React7.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React8.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -3992,7 +3992,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React7.Children.forEach(props.children, function(child) {
+                  React8.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -23582,11 +23582,11 @@
   });
 
   // src/main.jsx
-  var import_react6 = __toESM(require_react());
+  var import_react8 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // src/app.jsx
-  var import_react5 = __toESM(require_react());
+  var import_react7 = __toESM(require_react());
 
   // node_modules/react-router-dom/dist/index.js
   var React2 = __toESM(require_react());
@@ -25570,33 +25570,124 @@
     return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
   }
 
-  // src/containers/home.jsx
+  // src/containers/login.jsx
   var import_react2 = __toESM(require_react());
 
-  // src/hooks/useRepairs.js
+  // src/services/authApi.js
+  var API_URL = "http://localhost:8000";
+  async function login(username, password, token) {
+    const res = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || "Login failed");
+    }
+    return data;
+  }
+
+  // src/hooks/useAuth.js
   var import_react = __toESM(require_react());
+  function useAuth() {
+    const [token, setToken] = (0, import_react.useState)(localStorage.getItem("token"));
+    const signIn = async (username, password) => {
+      const res = await login(username, password, token);
+      if (res.access_token) {
+        setToken(res.access_token);
+        localStorage.setItem("token", res.access_token);
+      }
+      return res;
+    };
+    const logout = () => {
+      setToken(null);
+      localStorage.removeItem("token");
+    };
+    return { token, signIn, logout };
+  }
+
+  // src/containers/login.jsx
+  function Login() {
+    const [username, setUsername] = (0, import_react2.useState)("");
+    const [password, setPassword] = (0, import_react2.useState)("");
+    const { signIn } = useAuth();
+    const navigate = useNavigate();
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      const res = await signIn(username, password);
+      if (res.access_token) {
+        navigate("/");
+      } else {
+        alert("Login Failed");
+      }
+    };
+    return /* @__PURE__ */ import_react2.default.createElement("form", { onSubmit: handleLogin }, /* @__PURE__ */ import_react2.default.createElement(
+      "input",
+      {
+        placeholder: "username",
+        onChange: (e) => setUsername(e.target.value)
+      }
+    ), /* @__PURE__ */ import_react2.default.createElement(
+      "input",
+      {
+        type: "password",
+        placeholder: "password",
+        onChange: (e) => setPassword(e.target.value)
+      }
+    ), /* @__PURE__ */ import_react2.default.createElement("button", null, "Login"));
+  }
+
+  // src/containers/home.jsx
+  var import_react4 = __toESM(require_react());
+
+  // src/hooks/useRepairs.js
+  var import_react3 = __toESM(require_react());
 
   // src/services/repairsApi.js
-  var API_URL = "http://localhost:8000";
-  async function getRepairs() {
-    const res = await fetch(`${API_URL}/repairs`);
-    return res.json();
+  var API_URL2 = "http://localhost:8000";
+  async function getRepairs(token) {
+    const res = await fetch("http://localhost:8000/repairs", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error("Error fetching repairs");
+    }
+    return data;
   }
-  async function createRepair(data) {
-    const res = await fetch(`${API_URL}/repairs`, {
+  async function createRepair(token, repair) {
+    const res = await fetch(`${API_URL2}/repairs`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(repair)
     });
     return res.json();
   }
 
   // src/hooks/useRepairs.js
   function useRepairs() {
-    const [repairs, setRepairs] = (0, import_react.useState)([]);
-    const [loading, setLoading] = (0, import_react.useState)(true);
-    (0, import_react.useEffect)(() => {
-      getRepairs().then((data) => setRepairs(data)).finally(() => setLoading(false));
+    const [repairs, setRepairs] = (0, import_react3.useState)([]);
+    const [loading, setLoading] = (0, import_react3.useState)(true);
+    (0, import_react3.useEffect)(() => {
+      const fetchData = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const data = await getRepairs(token);
+          setRepairs(data);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
     }, []);
     return { repairs, loading };
   }
@@ -25604,21 +25695,33 @@
   // src/containers/home.jsx
   function Home() {
     const { repairs, loading } = useRepairs();
-    return /* @__PURE__ */ import_react2.default.createElement("div", { className: "container py-5" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center mb-4" }, /* @__PURE__ */ import_react2.default.createElement("h1", { className: "fw-bold" }, "Vehicle Repair System"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "text-muted" }, "Track and manage repairs easily")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "d-flex justify-content-end mb-4" }, /* @__PURE__ */ import_react2.default.createElement(Link, { to: "/create", className: "btn btn-primary" }, "+ Create Repair")), loading && /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center text-muted" }, "Loading repairs..."), /* @__PURE__ */ import_react2.default.createElement("div", { className: "row g-3" }, repairs.map((r) => /* @__PURE__ */ import_react2.default.createElement("div", { className: "col-md-4", key: r.id }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "card shadow-sm border-0 h-100" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "card-body" }, /* @__PURE__ */ import_react2.default.createElement("h5", { className: "card-title" }, r.vehicle), /* @__PURE__ */ import_react2.default.createElement("p", { className: "card-text text-muted" }, r.issue), /* @__PURE__ */ import_react2.default.createElement("div", { className: "d-flex justify-content-between align-items-center" }, /* @__PURE__ */ import_react2.default.createElement("span", { className: "badge bg-success" }, "$", r.cost), /* @__PURE__ */ import_react2.default.createElement("small", { className: "text-muted" }, "ID: ", r.id))))))));
+    const navigate = useNavigate();
+    const handleLogout = () => {
+      localStorage.removeItem("token");
+      window.location.reload();
+    };
+    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "container py-5" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-center mb-4" }, /* @__PURE__ */ import_react4.default.createElement("h1", { className: "fw-bold" }, "Vehicle Repair System"), /* @__PURE__ */ import_react4.default.createElement("p", { className: "text-muted" }, "Track and manage repairs easily")), /* @__PURE__ */ import_react4.default.createElement("div", { className: "d-flex justify-content-end mb-4" }, /* @__PURE__ */ import_react4.default.createElement(Link, { to: "/create", className: "btn btn-primary" }, "+ Create Repair")), loading && /* @__PURE__ */ import_react4.default.createElement("div", { className: "text-center text-muted" }, "Loading repairs..."), /* @__PURE__ */ import_react4.default.createElement("div", { className: "row g-3" }, repairs.map((r) => /* @__PURE__ */ import_react4.default.createElement("div", { className: "col-md-4", key: r.id }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "card shadow-sm border-0 h-100" }, /* @__PURE__ */ import_react4.default.createElement("div", { className: "card-body" }, /* @__PURE__ */ import_react4.default.createElement("h5", { className: "card-title" }, r.vehicle), /* @__PURE__ */ import_react4.default.createElement("p", { className: "card-text text-muted" }, r.issue), /* @__PURE__ */ import_react4.default.createElement("div", { className: "d-flex justify-content-between align-items-center" }, /* @__PURE__ */ import_react4.default.createElement("span", { className: "badge bg-success" }, "$", r.cost), /* @__PURE__ */ import_react4.default.createElement("small", { className: "text-muted" }, "ID: ", r.id))))))), /* @__PURE__ */ import_react4.default.createElement("div", { className: "container" }, /* @__PURE__ */ import_react4.default.createElement(
+      "button",
+      {
+        className: "btn btn-danger",
+        onClick: handleLogout
+      },
+      "Logout"
+    )));
   }
 
   // src/containers/repairForm.jsx
-  var import_react4 = __toESM(require_react());
+  var import_react6 = __toESM(require_react());
 
   // src/hooks/useRepairForm.js
-  var import_react3 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
   function useRepairForm(initial = {
     id: "",
     vehicle: "",
     issue: "",
     cost: ""
   }) {
-    const [form, setForm] = (0, import_react3.useState)(initial);
+    const [form, setForm] = (0, import_react5.useState)(initial);
     const handleChange = (e) => {
       setForm({
         ...form,
@@ -25637,7 +25740,8 @@
   // src/hooks/useCreateRepair.js
   function useCreateRepair() {
     const submit = async (form) => {
-      return await createRepair({
+      const token = localStorage.getItem("token");
+      return await createRepair(token, {
         ...form,
         id: Number(form.id),
         cost: Number(form.cost)
@@ -25656,7 +25760,7 @@
       reset();
       alert("Repair created");
     };
-    return /* @__PURE__ */ import_react4.default.createElement("div", { className: "container py-5", style: { maxWidth: "600px" } }, /* @__PURE__ */ import_react4.default.createElement("h2", { className: "mb-4" }, "Create Repair"), /* @__PURE__ */ import_react4.default.createElement("form", { onSubmit: handleSubmit, className: "card p-4 shadow-sm" }, /* @__PURE__ */ import_react4.default.createElement(
+    return /* @__PURE__ */ import_react6.default.createElement("div", { className: "container py-5", style: { maxWidth: "600px" } }, /* @__PURE__ */ import_react6.default.createElement("h2", { className: "mb-4" }, "Create Repair"), /* @__PURE__ */ import_react6.default.createElement("form", { onSubmit: handleSubmit, className: "card p-4 shadow-sm" }, /* @__PURE__ */ import_react6.default.createElement(
       "input",
       {
         className: "form-control mb-2",
@@ -25665,7 +25769,7 @@
         value: form.id,
         onChange: handleChange
       }
-    ), /* @__PURE__ */ import_react4.default.createElement(
+    ), /* @__PURE__ */ import_react6.default.createElement(
       "input",
       {
         className: "form-control mb-2",
@@ -25674,7 +25778,7 @@
         value: form.vehicle,
         onChange: handleChange
       }
-    ), /* @__PURE__ */ import_react4.default.createElement(
+    ), /* @__PURE__ */ import_react6.default.createElement(
       "input",
       {
         className: "form-control mb-2",
@@ -25683,7 +25787,7 @@
         value: form.issue,
         onChange: handleChange
       }
-    ), /* @__PURE__ */ import_react4.default.createElement(
+    ), /* @__PURE__ */ import_react6.default.createElement(
       "input",
       {
         className: "form-control mb-3",
@@ -25692,17 +25796,24 @@
         value: form.cost,
         onChange: handleChange
       }
-    ), /* @__PURE__ */ import_react4.default.createElement("button", { className: "btn btn-primary w-100" }, "Create Repair")), /* @__PURE__ */ import_react4.default.createElement("div", { className: "card" }, /* @__PURE__ */ import_react4.default.createElement("button", { className: "btn w-100" }, " ", /* @__PURE__ */ import_react4.default.createElement(Link, { to: "/" }, "Go Back"), " ")));
+    ), /* @__PURE__ */ import_react6.default.createElement("button", { className: "btn btn-primary w-100" }, "Create Repair")), /* @__PURE__ */ import_react6.default.createElement("div", { className: "card" }, /* @__PURE__ */ import_react6.default.createElement("button", { className: "btn w-100" }, " ", /* @__PURE__ */ import_react6.default.createElement(Link, { to: "/" }, "Go Back"), " ")));
   }
 
   // src/app.jsx
   function App() {
-    return /* @__PURE__ */ import_react5.default.createElement(BrowserRouter, null, /* @__PURE__ */ import_react5.default.createElement(Routes, null, /* @__PURE__ */ import_react5.default.createElement(Route, { path: "/", element: /* @__PURE__ */ import_react5.default.createElement(Home, null) }), /* @__PURE__ */ import_react5.default.createElement(Route, { path: "/create", element: /* @__PURE__ */ import_react5.default.createElement(RepairForm, null) })));
+    const token = localStorage.getItem("token");
+    return /* @__PURE__ */ import_react7.default.createElement(BrowserRouter, null, /* @__PURE__ */ import_react7.default.createElement(Routes, null, /* @__PURE__ */ import_react7.default.createElement(
+      Route,
+      {
+        path: "/",
+        element: token ? /* @__PURE__ */ import_react7.default.createElement(Home, null) : /* @__PURE__ */ import_react7.default.createElement(Login, null)
+      }
+    ), /* @__PURE__ */ import_react7.default.createElement(Route, { path: "/create", element: /* @__PURE__ */ import_react7.default.createElement(RepairForm, null) })));
   }
 
   // src/main.jsx
   var root = (0, import_client.createRoot)(document.getElementById("root"));
-  root.render(/* @__PURE__ */ import_react6.default.createElement(App, null));
+  root.render(/* @__PURE__ */ import_react8.default.createElement(App, null));
 })();
 /*! Bundled license information:
 

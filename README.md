@@ -38,6 +38,15 @@ sudo systemctl start docker
 sudo apt install docker-compose
 ```
 
+
+## Python 
+TODO
+```bash
+cd backend]
+```
+
+
+
 ---
 
 ## Frontend Dependencies (POC)
