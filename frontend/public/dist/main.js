@@ -25795,7 +25795,7 @@ function RepairForm() {
       value: form.cost,
       onChange: handleChange
     }
-  ), /* @__PURE__ */ import_react6.default.createElement("button", { className: "btn btn-primary w-100" }, "Create Repair")), /* @__PURE__ */ import_react6.default.createElement("div", { className: "card" }, /* @__PURE__ */ import_react6.default.createElement("button", { className: "btn w-100" }, " ", /* @__PURE__ */ import_react6.default.createElement(Link, { to: "/" }, "Go Back"), " ")));
+  ), /* @__PURE__ */ import_react6.default.createElement("button", { className: "btn btn-primary w-100" }, "Create Repair")), /* @__PURE__ */ import_react6.default.createElement("div", null, /* @__PURE__ */ import_react6.default.createElement(Link, { to: "/" }, "Go Back")));
 }
 
 // src/app.jsx

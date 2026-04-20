@@ -58,8 +58,8 @@ export default function RepairForm() {
         </button>
         
       </form>
-      <div className="card">
-        <button className="btn w-100"> <Link to="/">Go Back</Link> </button>
+      <div>
+        <Link to="/">Go Back</Link>
       </div>
       
     </div>
