@@ -39,13 +39,11 @@ sudo apt install docker-compose
 ```
 
 
-## Python 
+## Python test
 TODO
 ```bash
-cd backend]
+sudo docker-compose run backend pytest -v
 ```
-
-
 
 ---
 
