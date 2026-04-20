@@ -15,9 +15,9 @@ export default function Login() {
     const res = await signIn(username, password);
 
     if (res.access_token) {
-      navigate("/");
+      window.location.reload()
     } else {
-        alert("Login Failed");
+      alert("Login Failed");
     }
   };
 

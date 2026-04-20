@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = __API_URL__
 
 export async function getRepairs(token) {
   const res = await fetch("http://localhost:8000/repairs", {
